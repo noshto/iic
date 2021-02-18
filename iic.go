@@ -71,7 +71,6 @@ func GenerateIIC(SafenetConfig *safenet.Config, params [7]string) (string, strin
 		params[5], // SoftCode
 		params[6], // TotPrice
 	)
-	fmt.Printf("Plain IIC: %s", plainIIC)
 
 	hasher := crypto.SHA256.New()
 	_, err := hasher.Write([]byte(plainIIC))
