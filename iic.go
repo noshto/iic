@@ -23,13 +23,6 @@ func WriteIIC(params *Params) error {
 		return err
 	}
 
-	// Initialize Signer
-	signer := safenet.SafeNet{}
-	if err := signer.Initialize(params.SafenetConfig); err != nil {
-		return err
-	}
-	defer signer.Finalize()
-
 	// Parse parameters
 	parsed, err := parse(doc)
 	if err != nil {
@@ -37,7 +30,7 @@ func WriteIIC(params *Params) error {
 	}
 
 	// Generate
-	IIC, IICSignature, err := GenerateIIC(signer, parsed)
+	IIC, IICSignature, err := GenerateIIC(params.SafenetConfig, parsed)
 	if err != nil {
 		return err
 	}
@@ -60,7 +53,14 @@ func WriteIIC(params *Params) error {
 }
 
 // GenerateIIC generates IIC and IICSignature. Orders of parameters: TIN, IssueDateTime, InvOrdNum, BusinUnitCode, TCRCode, SoftCode, TotPrice
-func GenerateIIC(signer safenet.SafeNet, params ...interface{}) (string, string, error) {
+func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, string, error) {
+	// Initialize Signer
+	signer := safenet.SafeNet{}
+	if err := signer.Initialize(SafenetConfig); err != nil {
+		return "", "", err
+	}
+	defer signer.Finalize()
+
 	plainIIC := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", params...)
 
 	hasher := crypto.SHA256.New()
