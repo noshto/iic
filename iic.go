@@ -61,8 +61,8 @@ func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, 
 	}
 	defer signer.Finalize()
 
-	plainIIC := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", params...)
-	fmt.Printf("PLain IIC: %s", plainIIC)
+	plainIIC := fmt.Sprintf("%v|%v|%v|%v|%v|%v|%v", params[0], params[1], params[2], params[3], params[4], params[5], params[6])
+	fmt.Printf("Plain IIC: %s", plainIIC)
 
 	hasher := crypto.SHA256.New()
 	_, err := hasher.Write([]byte(plainIIC))
