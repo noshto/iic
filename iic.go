@@ -106,7 +106,7 @@ func parse(doc *etree.Document) ([]interface{}, error) {
 	if err != nil {
 		return []interface{}{}, err
 	}
-	TCRCode, err := attributeOfElement("//Invoice", "SoftCode", doc)
+	TCRCode, err := attributeOfElement("//Invoice", "TCRCode", doc)
 	if err != nil {
 		return []interface{}{}, err
 	}
