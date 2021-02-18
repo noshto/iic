@@ -62,6 +62,7 @@ func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, 
 	defer signer.Finalize()
 
 	plainIIC := fmt.Sprintf("%s|%s|%s|%s|%s|%s|%s", params...)
+	fmt.Printf("PLain IIC: %s", plainIIC)
 
 	hasher := crypto.SHA256.New()
 	_, err := hasher.Write([]byte(plainIIC))
@@ -86,6 +87,10 @@ func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, 
 
 // Parse retrieves values necessary for IIC generation from given doc
 func parse(doc *etree.Document) ([]interface{}, error) {
+	TIN, err := attributeOfElement("//Seller", "IDNum", doc)
+	if err != nil {
+		return []interface{}{}, err
+	}
 	IssueDateTime, err := attributeOfElement("//Invoice", "IssueDateTime", doc)
 	if err != nil {
 		return []interface{}{}, err
@@ -94,15 +99,7 @@ func parse(doc *etree.Document) ([]interface{}, error) {
 	if err != nil {
 		return []interface{}{}, err
 	}
-	TotPrice, err := attributeOfElement("//Invoice", "TotPrice", doc)
-	if err != nil {
-		return []interface{}{}, err
-	}
 	BusinUnitCode, err := attributeOfElement("//Invoice", "BusinUnitCode", doc)
-	if err != nil {
-		return []interface{}{}, err
-	}
-	SoftCode, err := attributeOfElement("//Invoice", "SoftCode", doc)
 	if err != nil {
 		return []interface{}{}, err
 	}
@@ -110,7 +107,11 @@ func parse(doc *etree.Document) ([]interface{}, error) {
 	if err != nil {
 		return []interface{}{}, err
 	}
-	TIN, err := attributeOfElement("//Seller", "IDNum", doc)
+	SoftCode, err := attributeOfElement("//Invoice", "SoftCode", doc)
+	if err != nil {
+		return []interface{}{}, err
+	}
+	TotPrice, err := attributeOfElement("//Invoice", "TotPrice", doc)
 	if err != nil {
 		return []interface{}{}, err
 	}
