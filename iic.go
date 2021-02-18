@@ -53,7 +53,7 @@ func WriteIIC(params *Params) error {
 }
 
 // GenerateIIC generates IIC and IICSignature. Orders of parameters: TIN, IssueDateTime, InvOrdNum, BusinUnitCode, TCRCode, SoftCode, TotPrice
-func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, string, error) {
+func GenerateIIC(SafenetConfig *safenet.Config, params [7]string) (string, string, error) {
 	// Initialize Signer
 	signer := safenet.SafeNet{}
 	if err := signer.Initialize(SafenetConfig); err != nil {
@@ -61,7 +61,16 @@ func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, 
 	}
 	defer signer.Finalize()
 
-	plainIIC := fmt.Sprintf("%v|%v|%v|%v|%v|%v|%v", params[0], params[1], params[2], params[3], params[4], params[5], params[6])
+	plainIIC := fmt.Sprintf(
+		"%v|%v|%v|%v|%v|%v|%v",
+		params[0], // TIN
+		params[1], // IssueDateTime
+		params[2], // InvOrdNum
+		params[3], // BusinUnitCode
+		params[4], // TCRCode
+		params[5], // SoftCode
+		params[6], // TotPrice
+	)
 	fmt.Printf("Plain IIC: %s", plainIIC)
 
 	hasher := crypto.SHA256.New()
@@ -86,37 +95,37 @@ func GenerateIIC(SafenetConfig *safenet.Config, params ...interface{}) (string, 
 }
 
 // Parse retrieves values necessary for IIC generation from given doc
-func parse(doc *etree.Document) ([]interface{}, error) {
+func parse(doc *etree.Document) ([7]string, error) {
 	TIN, err := attributeOfElement("//Seller", "IDNum", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	IssueDateTime, err := attributeOfElement("//Invoice", "IssueDateTime", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	InvOrdNum, err := attributeOfElement("//Invoice", "InvOrdNum", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	BusinUnitCode, err := attributeOfElement("//Invoice", "BusinUnitCode", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	TCRCode, err := attributeOfElement("//Invoice", "TCRCode", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	SoftCode, err := attributeOfElement("//Invoice", "SoftCode", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 	TotPrice, err := attributeOfElement("//Invoice", "TotPrice", doc)
 	if err != nil {
-		return []interface{}{}, err
+		return [7]string{}, err
 	}
 
-	return []interface{}{TIN, IssueDateTime, InvOrdNum, BusinUnitCode, TCRCode, SoftCode, TotPrice}, nil
+	return [7]string{TIN, IssueDateTime, InvOrdNum, BusinUnitCode, TCRCode, SoftCode, TotPrice}, nil
 }
 
 // AttributeOfElement returns an attribute value if it's found in given element
